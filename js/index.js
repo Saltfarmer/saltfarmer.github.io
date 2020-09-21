@@ -1,10 +1,10 @@
 $(function(){
 	$(".typed").typed({
-		strings: ["Dreamer.", "University Student.", "Programmer.", "Data Scientist.", "Developer.", "Blogger.", "Gamer."],
+		strings: ["Programmer.", "Data Scientist.", "Developer.", "Blogger.", "Gamer."],
 		// Optionally use an HTML element to grab strings from (must wrap each string in a <p>)
 		stringsElement: null,
 		// typing speed
-		typeSpeed: 20,
+		typeSpeed: 15,
 		// time before typing starts
 		startDelay: 1200,
 		// backspacing speed
