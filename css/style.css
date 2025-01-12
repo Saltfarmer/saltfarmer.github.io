@@ -67,6 +67,58 @@ hr {
   padding: 0
 }
 
+/* Card Container */
+.card-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.site-title {
+  font-size: 3rem;
+  color: #ffffff;
+  text-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff, 0 0 40px #ffffff;
+  animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+  0% { text-shadow: 0 0 10px #ffffff, 0 0 20px #FF6B6B, 0 0 40px #FF6B6B; }
+  100% { text-shadow: 0 0 20px #4ECDC4, 0 0 40px #4ECDC4, 0 0 80px #4ECDC4; }
+}
+
+/* Card Styling */
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 150px;
+  background-color: rgba(255, 255, 255, 0.5); /* 50% transparent white */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-decoration: none;
+  color: #333;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card i {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.card span {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* Hover Effect */
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
 input, select {
   vertical-align: middle
 }

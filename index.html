@@ -8,7 +8,7 @@
   <title>Welcome to Saltfarmer</title>
   <link rel="stylesheet" media="screen" href="css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
-  <link rel = "icon" href = "img/GC3K-removebg-preview.png" type = "image/x-icon">
+  <link rel="icon" href="img/saltlogo.png" type="image/x-icon">
 </head>
 
 <body>
@@ -16,22 +16,51 @@
   <div id="particles-js"></div>
   <div class="content">
     <h1>
-        <span class="site-title">Candra Gctk</span>
-        <span class="site-description">I am <span class="typed"></span></span>
+      <span class="site-title">Candra Gctk</span>
+      <span class="site-description">I am <span class="typed"></span></span>
     </h1>
-    <a class="link" href="https://saltfarmer.github.io/blog" data-scroll><i class="fa-solid fa-blog"></i> Blog</a>
-    <a class="link" href="https://www.opendota.com/players/296360583" data-scroll><i class="fa-solid fa-table"></i> Opendota</a>
-    <a class="link" href="https://saltfarmer.github.io/404" data-scroll><i class="fa-solid fa-file"></i> Resume</a>
-    
+    <div class="card-container">
+      <a class="card" href="https://saltfarmer.github.io/blog" data-scroll>
+        <i class="fa-solid fa-blog"></i>
+        <span>Blog</span>
+      </a>
+      <a class="card" href="https://www.opendota.com/players/296360583" data-scroll>
+        <i class="fa-solid fa-table"></i>
+        <span>Opendota</span>
+      </a>
+      <a class="card" href="https://drive.google.com/file/d/1ZqT0iCd9e4fxA3_8UsjZernF3ZDfELe7/view?usp=sharing" data-scroll>
+        <i class="fa-solid fa-file"></i>
+        <span>Resume</span>
+      </a>
+    </div>
   </div>
+
+  <!-- Audio -->
+  <audio id="hover-sound" src="sounds/chill-guy.mp3" loop></audio>
+
   <!-- scripts -->
   <script src="js/particles.js"></script>
   <script src="js/app.js"></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js'></script>
-  <script src=""></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/typed.js/1.1.1/typed.min.js'></script>
-
   <script src="js/index.js"></script>
+
+  <!-- Hover sound script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const hoverSound = document.getElementById('hover-sound');
+
+      // Play audio on page load (optional)
+      hoverSound.play();
+
+      // Attach hover sound to cards
+      document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+          hoverSound.play();
+        });
+      });
+    });
+  </script>
 </body>
 
 </html>
