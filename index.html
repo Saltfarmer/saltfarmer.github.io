@@ -5,7 +5,11 @@
   <meta charset="utf-8">
   <meta name="msvalidate.01" content="946C4DCF0B211FE49CC49FDAFD2C084B" />
   <meta name="google-site-verification" content="sjRGvMyfBSMCC9CEVeOjQwIzLk3g5VB-BsiGYu4Xomg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Candra Gctk: programmer, data scientist, writer, gamer, auditor. Blog, Opendota and resume.">
+  <meta name="theme-color" content="#0857C3">
   <title>Welcome to Saltfarmer</title>
+  <link rel="preload" href="fonts/inter-Bold.woff" as="font" type="font/woff" crossorigin>
   <link rel="stylesheet" media="screen" href="css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
   <link rel="icon" href="img/saltlogo.png" type="image/x-icon">
@@ -14,26 +18,31 @@
 <body>
   <!-- particles.js container -->
   <div id="particles-js"></div>
-  <div class="content">
+  <main class="content">
     <h1>
       <span class="site-title">Candra Gctk</span>
       <span class="site-description">I am <span class="typed"></span></span>
     </h1>
-    <div class="card-container">
+    <nav class="card-container" aria-label="My links">
       <a class="card" href="https://saltfarmer.github.io/blog" data-scroll>
-        <i class="fa-solid fa-blog"></i>
+        <i class="fa-solid fa-blog" aria-hidden="true"></i>
         <span>Blog</span>
       </a>
       <a class="card" href="https://www.opendota.com/players/296360583" data-scroll>
-        <i class="fa-solid fa-table"></i>
+        <i class="fa-solid fa-table" aria-hidden="true"></i>
         <span>Opendota</span>
       </a>
       <a class="card" href="https://saltfarmer.github.io/CV-2026/" data-scroll>
-        <i class="fa-solid fa-file"></i>
+        <i class="fa-solid fa-file" aria-hidden="true"></i>
         <span>Resume</span>
       </a>
-    </div>
-  </div>
+    </nav>
+  </main>
+
+  <button id="sound-toggle" class="sound" type="button" aria-pressed="true" aria-label="Turn background music off" title="Music on/off">
+    <i class="fa-solid fa-volume-high" aria-hidden="true"></i>
+  </button>
+  <footer class="foot">&copy; Saltfarmer</footer>
 
   <!-- Audio -->
   <audio id="hover-sound" src="sounds/chill-guy.mp3" loop></audio>
@@ -45,20 +54,46 @@
   <script src='https://cdnjs.cloudflare.com/ajax/libs/typed.js/1.1.1/typed.min.js'></script>
   <script src="js/index.js"></script>
 
-  <!-- Hover sound script -->
+  <!-- Music: same track, same hover behaviour, plus an on/off button -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const hoverSound = document.getElementById('hover-sound');
+      const audio = document.getElementById('hover-sound');
+      const btn = document.getElementById('sound-toggle');
+      const icon = btn.querySelector('i');
+      let muted = false;
+      try { muted = localStorage.getItem('gate-muted') === '1'; } catch (e) {}
 
-      // Play audio on page load (optional)
-      hoverSound.play();
+      const paint = () => {
+        btn.setAttribute('aria-pressed', String(!muted));
+        btn.setAttribute('aria-label', muted ? 'Turn background music on' : 'Turn background music off');
+        icon.className = muted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
+      };
 
-      // Attach hover sound to cards
-      document.querySelectorAll('.card').forEach(card => {
-        card.addEventListener('mouseenter', () => {
-          hoverSound.play();
-        });
+      // Browsers block autoplay until the visitor interacts: retry on the first interaction.
+      const play = () => {
+        if (muted) return;
+        const p = audio.play();
+        if (p && p.catch) {
+          p.catch(() => {
+            const retry = () => { if (!muted) audio.play().catch(() => {}); };
+            ['pointerdown', 'keydown', 'touchstart'].forEach(e => window.addEventListener(e, retry, { once: true }));
+          });
+        }
+      };
+
+      btn.addEventListener('click', () => {
+        muted = !muted;
+        try { localStorage.setItem('gate-muted', muted ? '1' : '0'); } catch (e) {}
+        if (muted) audio.pause(); else audio.play().catch(() => {});
+        paint();
       });
+
+      document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('mouseenter', () => { if (!muted && audio.paused) audio.play().catch(() => {}); });
+      });
+
+      paint();
+      play();
     });
   </script>
 </body>
