@@ -1,0 +1,2 @@
+Delete these old files from your repo after copying (or replace the whole folder, keeping .git):
+  (none)
