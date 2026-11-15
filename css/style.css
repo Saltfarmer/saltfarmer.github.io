@@ -36,7 +36,7 @@ body {
   font-size: 16px;
   line-height: 1.5;
   color: #fff;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 canvas { display: block; vertical-align: bottom; }
@@ -45,6 +45,9 @@ a { text-decoration: none; color: inherit; }
 
 /* ---- particles.js container (background kept as-is) ---- */
 #particles-js {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
   width: 100%;
   height: 100%;
   /* Was hotlinked from an old Pinterest CDN host. Now a self-contained gradient in the brand palette.
@@ -62,15 +65,19 @@ a { text-decoration: none; color: inherit; }
 
 /* ---- Content ---- */
 .content {
-  position: absolute;
+  position: relative;
   z-index: 1;
-  top: 50%;
-  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
   width: 100%;
-  max-width: 720px;
-  padding: 0 20px;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 84px 20px 96px;
   text-align: center;
-  transform: translate(-50%, -50%);
   pointer-events: none; /* let the particles react around the text */
 }
 
@@ -172,6 +179,46 @@ a { text-decoration: none; color: inherit; }
   outline-offset: 3px;
 }
 
+/* ---- Contact buttons ---- */
+.social {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+  pointer-events: auto;
+}
+
+.social-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+.social-btn i { color: var(--mentari); font-size: 1rem; }
+.social-btn:hover,
+.social-btn:focus-visible {
+  transform: translateY(-3px);
+  background: rgba(48, 127, 226, 0.22);
+  border-color: var(--cakrawala);
+}
+.social-btn:focus-visible { outline: 2px solid var(--mentari); outline-offset: 3px; }
+
+/* Small phones: 2x2 cards so everything fits */
+@media (max-width: 520px) {
+  .card-container { gap: 12px; }
+  .card { width: calc(50% - 6px); max-width: 160px; height: 104px; }
+}
+
 /* ---- Logo, top left ---- */
 .brand {
   position: fixed;
@@ -228,7 +275,7 @@ a { text-decoration: none; color: inherit; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .card, .card i, .sound, .brand { transition: none; }
+  .card, .card i, .sound, .brand, .social-btn { transition: none; }
   .brand:hover { transform: none; }
-  .card:hover, .card:focus-visible { transform: none; }
+  .card:hover, .card:focus-visible, .social-btn:hover { transform: none; }
 }

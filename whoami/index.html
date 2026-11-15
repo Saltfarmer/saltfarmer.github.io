@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Who is Saltfarmer? Candra's hero profile: data scientist, auditor, blogger and Dota player.">
+  <meta name="theme-color" content="#0857C3">
+  <meta property="og:title" content="Who am I? | Saltfarmer">
+  <meta property="og:description" content="Data person by day, Dota player by night, blogger whenever I remember.">
+  <meta property="og:type" content="profile">
+  <meta property="og:url" content="https://saltfarmer.github.io/whoami/">
+  <title>Who am I? | Saltfarmer</title>
+  <link rel="icon" href="../img/favicon.png" type="image/png" sizes="48x48">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+  <style>
+    @font-face { font-family: "Inter"; font-weight: 400; font-display: swap; src: url("../fonts/inter-Regular.woff") format("woff"); }
+    @font-face { font-family: "Inter"; font-weight: 600; font-display: swap; src: url("../fonts/inter-SemiBold.woff") format("woff"); }
+    @font-face { font-family: "Inter"; font-weight: 700; font-display: swap; src: url("../fonts/inter-Bold.woff") format("woff"); }
+
+    :root {
+      --nusantara: #0857C3; --cakrawala: #307FE2; --mentari: #71C5E8;
+      --navy: #042A61; --ice: #D6EFFB; --amber: #C37408; --gold: #E8A271;
+      --glass: rgba(255, 255, 255, 0.07); --line: rgba(255, 255, 255, 0.16);
+      --muted: rgba(255, 255, 255, 0.72);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      line-height: 1.6;
+      color: #fff;
+      background:
+        radial-gradient(ellipse at 15% 0%, rgba(113, 197, 232, 0.22) 0%, transparent 50%),
+        radial-gradient(ellipse at 90% 40%, rgba(48, 127, 226, 0.22) 0%, transparent 45%),
+        linear-gradient(170deg, #042A61 0%, #0B1F45 50%, #0a0f1f 100%) fixed;
+      min-height: 100vh;
+    }
+    a { color: var(--mentari); text-decoration: none; }
+    a:hover { color: var(--ice); }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--mentari); outline-offset: 3px; border-radius: 6px; }
+
+    .wrap { max-width: 920px; margin: 0 auto; padding: 28px 20px 80px; }
+    .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 36px; }
+    .top a { font-weight: 600; font-size: 0.9rem; }
+    .brand { width: 44px; height: 44px; border-radius: 50%; overflow: hidden; background: #fff; display: block; box-shadow: 0 4px 16px rgba(0,0,0,.35); }
+    .brand img { width: 100%; height: 100%; display: block; }
+
+    .panel {
+      background: var(--glass);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 26px;
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      margin-bottom: 22px;
+    }
+    h1, h2, h3 { margin: 0; line-height: 1.15; }
+    h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+    h2 i { color: var(--mentari); font-size: 1.1rem; }
+    .kicker { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mentari); }
+
+    /* ---- Hero ---- */
+    .hero { display: grid; grid-template-columns: 150px 1fr; gap: 26px; align-items: center; }
+    .portrait {
+      width: 150px; height: 150px; border-radius: 28px;
+      background: linear-gradient(145deg, var(--nusantara), var(--cakrawala));
+      display: grid; place-items: center;
+      border: 3px solid var(--mentari);
+      box-shadow: 0 0 0 6px rgba(113, 197, 232, 0.15), 0 18px 40px rgba(8, 87, 195, 0.45);
+      position: relative;
+    }
+    .portrait img { width: 92px; height: 92px; border-radius: 50%; background: #fff; }
+    .level {
+      position: absolute; bottom: -12px; right: -12px;
+      background: var(--amber); color: #fff; font-weight: 700; font-size: 0.8rem;
+      padding: 6px 10px; border-radius: 999px; border: 2px solid #0B1F45;
+    }
+    .hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 700; letter-spacing: -0.03em; margin: 6px 0 6px; }
+    .hero .real { color: var(--muted); margin: 0 0 12px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag {
+      font-size: 0.78rem; font-weight: 600; padding: 5px 11px; border-radius: 999px;
+      background: rgba(48, 127, 226, 0.22); border: 1px solid rgba(113, 197, 232, 0.45);
+    }
+    .tag.gold { background: rgba(195, 116, 8, 0.25); border-color: rgba(232, 162, 113, 0.6); }
+    .intro { font-size: 1.08rem; color: var(--muted); margin: 20px 0 0; }
+    .intro b { color: #fff; }
+
+    /* ---- Stats ---- */
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .stat { background: rgba(4, 42, 97, 0.55); border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
+    .stat .num { font-size: 1.9rem; font-weight: 700; color: var(--mentari); line-height: 1; }
+    .stat .lbl { font-size: 0.85rem; color: var(--muted); margin-top: 6px; }
+
+    /* ---- Abilities ---- */
+    .abilities { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .ability { display: grid; grid-template-columns: 54px 1fr; gap: 14px; align-items: start; padding: 14px; border-radius: 16px; background: rgba(4, 42, 97, 0.45); border: 1px solid var(--line); }
+    .key {
+      width: 54px; height: 54px; border-radius: 14px; display: grid; place-items: center;
+      font-weight: 700; font-size: 1.3rem; color: #fff;
+      background: linear-gradient(145deg, var(--nusantara), var(--cakrawala));
+      border: 2px solid var(--mentari);
+    }
+    .ability.ult .key { background: linear-gradient(145deg, var(--amber), var(--gold)); border-color: var(--gold); }
+    .ability h3 { font-size: 1rem; margin-bottom: 4px; }
+    .ability p { margin: 0; font-size: 0.9rem; color: var(--muted); }
+    .ability .cd { font-size: 0.75rem; color: var(--mentari); margin-top: 6px; display: block; }
+
+    /* ---- Inventory ---- */
+    .inventory { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+    .item {
+      aspect-ratio: 1; border-radius: 14px; display: grid; place-items: center; text-align: center;
+      background: rgba(4, 42, 97, 0.6); border: 1px solid var(--line); padding: 8px;
+      transition: transform .2s ease, border-color .2s ease;
+    }
+    .item:hover { transform: translateY(-4px); border-color: var(--mentari); }
+    .item i { font-size: 1.5rem; color: var(--mentari); }
+    .item span { display: block; font-size: 0.72rem; font-weight: 600; margin-top: 6px; line-height: 1.2; }
+    .item.farming { border-style: dashed; opacity: .85; }
+    .backpack { margin: 14px 0 0; font-size: 0.85rem; color: var(--muted); }
+
+    /* ---- Lore timeline ---- */
+    .timeline { list-style: none; margin: 0; padding: 0 0 0 22px; border-left: 2px solid rgba(113, 197, 232, 0.35); }
+    .timeline li { position: relative; padding: 0 0 20px 16px; }
+    .timeline li:last-child { padding-bottom: 0; }
+    .timeline li::before {
+      content: ""; position: absolute; left: -30px; top: 6px; width: 14px; height: 14px; border-radius: 4px;
+      background: var(--nusantara); border: 2px solid var(--mentari);
+    }
+    .timeline li.now::before { background: var(--amber); border-color: var(--gold); box-shadow: 0 0 0 5px rgba(195, 116, 8, .25); }
+    .timeline .yr { font-size: 0.8rem; font-weight: 700; color: var(--mentari); letter-spacing: .05em; }
+    .timeline h3 { font-size: 1rem; margin: 2px 0 2px; }
+    .timeline p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+
+    /* ---- Quests + facts ---- */
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .two .panel { margin-bottom: 0; }
+    .quests { list-style: none; margin: 0; padding: 0; }
+    .quests li { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--line); font-size: 0.93rem; }
+    .quests li:last-child { border-bottom: 0; }
+    .quests i { color: var(--mentari); margin-top: 4px; width: 16px; text-align: center; }
+    .quests .done i { color: #08C316; }
+
+    .facts { display: grid; gap: 10px; }
+    .fact {
+      width: 100%; text-align: left; cursor: pointer; font: inherit; color: #fff;
+      padding: 12px 14px; border-radius: 12px; background: rgba(4, 42, 97, .55); border: 1px solid var(--line);
+    }
+    .fact .q { font-weight: 600; display: flex; justify-content: space-between; gap: 10px; }
+    .fact .a { display: none; margin-top: 6px; color: var(--muted); font-size: 0.9rem; }
+    .fact[aria-expanded="true"] .a { display: block; }
+    .fact[aria-expanded="true"] .q i { transform: rotate(45deg); }
+    .fact .q i { color: var(--mentari); transition: transform .2s ease; }
+
+    /* ---- Patch notes + footer ---- */
+    .patch { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: 0.88rem; color: var(--muted); margin: 0; padding-left: 18px; }
+    .patch li { margin-bottom: 6px; }
+    .patch b { color: var(--mentari); font-weight: 600; }
+
+    .links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 999px;
+      font-weight: 600; font-size: 0.9rem; color: #fff;
+      background: rgba(255, 255, 255, 0.07); border: 1px solid var(--line);
+      transition: background .2s ease, border-color .2s ease, transform .2s ease;
+    }
+    .btn i { color: var(--mentari); }
+    .btn:hover { color: #fff; transform: translateY(-3px); background: rgba(48, 127, 226, .25); border-color: var(--cakrawala); }
+    .btn.primary { background: var(--nusantara); border-color: var(--nusantara); }
+    .btn.primary i { color: #fff; }
+    footer { text-align: center; color: rgba(255, 255, 255, .45); font-size: .8rem; margin-top: 28px; }
+
+    /* Reveal on scroll */
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.in { opacity: 1; transform: none; }
+
+    @media (max-width: 720px) {
+      .hero { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+      .tags { justify-content: center; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .abilities, .two { grid-template-columns: 1fr; }
+      .inventory { grid-template-columns: repeat(3, 1fr); }
+      .panel { padding: 20px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .reveal { opacity: 1; transform: none; transition: none; }
+      .item, .btn, .fact .q i { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <a class="brand" href="../" aria-label="Back to the gate"><img src="../img/newlogo.png" alt="" width="44" height="44"></a>
+      <a href="../"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to the gate</a>
+    </header>
+
+    <!-- Hero profile -->
+    <section class="panel">
+      <div class="hero">
+        <div class="portrait">
+          <img src="../img/newlogo.png" alt="Saltfarmer logo">
+          <span class="level" title="Years on this planet are classified; years blogging are not">Lv. 2017+</span>
+        </div>
+        <div>
+          <span class="kicker">Hero profile</span>
+          <h1>Saltfarmer</h1>
+          <p class="real">Real name: Gama Candra Tri Kartika &middot; Spawn point: Indonesia &middot; Current base: Jakarta</p>
+          <div class="tags">
+            <span class="tag">Data Scientist</span>
+            <span class="tag">Auditor</span>
+            <span class="tag">Programmer</span>
+            <span class="tag">Writer</span>
+            <span class="tag gold">Dota Player</span>
+          </div>
+        </div>
+      </div>
+      <p class="intro">Hi, I'm <b>Candra</b>. Data person by day, Dota player by night, blogger whenever I remember. My official tagline is <b>"Fans of codes and dotes"</b>, and honestly that covers about 80% of me.</p>
+    </section>
+
+    <!-- Base stats -->
+    <section class="panel reveal" aria-labelledby="stats-h">
+      <h2 id="stats-h"><i class="fa-solid fa-chart-simple" aria-hidden="true"></i> Base stats</h2>
+      <div class="stats">
+        <div class="stat"><div class="num" data-count="124">124</div><div class="lbl">blog posts written since 2017</div></div>
+        <div class="stat"><div class="num" data-count="11">11</div><div class="lbl">tutorial series started (some even finished)</div></div>
+        <div class="stat"><div class="num" data-count="4">4</div><div class="lbl">languages: Indonesian, Javanese, English, a bit of Dutch</div></div>
+        <div class="stat"><div class="num" data-count="2">2</div><div class="lbl">countries lived in: Indonesia &amp; the Netherlands</div></div>
+        <div class="stat"><div class="num" data-count="900" data-suffix="+">900+</div><div class="lbl">auditors using the tools I build</div></div>
+        <div class="stat"><div class="num" data-count="10000" data-suffix="+">10,000+</div><div class="lbl">audit documents made searchable</div></div>
+      </div>
+    </section>
+
+    <!-- Abilities -->
+    <section class="panel reveal" aria-labelledby="abil-h">
+      <h2 id="abil-h"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Abilities</h2>
+      <div class="abilities">
+        <div class="ability">
+          <div class="key">Q</div>
+          <div>
+            <h3>Pandas Strike</h3>
+            <p>Turns messy tables into clean ones with Python, pandas, PySpark and Hive. Deals bonus damage to duplicate rows.</p>
+            <span class="cd">Cooldown: one coffee</span>
+          </div>
+        </div>
+        <div class="ability">
+          <div class="key">W</div>
+          <div>
+            <h3>Dashboard Vision</h3>
+            <p>Grants true sight over the data. Summons dashboards in Superset, Tableau or Power BI so nobody cleans spreadsheets by hand again.</p>
+            <span class="cd">Passive: saves up to 2 days of manual work</span>
+          </div>
+        </div>
+        <div class="ability">
+          <div class="key">E</div>
+          <div>
+            <h3>Audit Sense</h3>
+            <p>Detects anomalies before they become problems. Built Key Risk Indicators that halved issue-detection time.</p>
+            <span class="cd">Aura: affects 18 regional audit offices</span>
+          </div>
+        </div>
+        <div class="ability ult">
+          <div class="key">R</div>
+          <div>
+            <h3>Prophet's Foresight</h3>
+            <p>Ultimate. Forecasts the future with time-series models (yes, I tried it on BBRI stock). Accuracy not guaranteed; the market is its own boss fight.</p>
+            <span class="cd">Not financial advice. Ever.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Inventory -->
+    <section class="panel reveal" aria-labelledby="inv-h">
+      <h2 id="inv-h"><i class="fa-solid fa-briefcase" aria-hidden="true"></i> Inventory</h2>
+      <div class="inventory">
+        <div class="item"><div><i class="fa-brands fa-python" aria-hidden="true"></i><span>Python</span></div></div>
+        <div class="item"><div><i class="fa-solid fa-database" aria-hidden="true"></i><span>SQL</span></div></div>
+        <div class="item"><div><i class="fa-solid fa-fire" aria-hidden="true"></i><span>PySpark + Hive</span></div></div>
+        <div class="item"><div><i class="fa-solid fa-chart-line" aria-hidden="true"></i><span>Superset · Tableau · Power BI</span></div></div>
+        <div class="item"><div><i class="fa-brands fa-microsoft" aria-hidden="true"></i><span>Azure</span></div></div>
+        <div class="item farming" title="Still farming this item"><div><i class="fa-brands fa-rust" aria-hidden="true"></i><span>Rust (farming…)</span></div></div>
+      </div>
+      <p class="backpack"><i class="fa-solid fa-box-open" aria-hidden="true"></i> Backpack: R, scikit-learn, XGBoost, Prophet, Streamlit, Plotly, Jekyll.</p>
+    </section>
+
+    <!-- Lore -->
+    <section class="panel reveal" aria-labelledby="lore-h">
+      <h2 id="lore-h"><i class="fa-solid fa-scroll" aria-hidden="true"></i> Lore</h2>
+      <ol class="timeline">
+        <li>
+          <span class="yr">2015 – 2019</span>
+          <h3>Tutorial island: Universitas Gadjah Mada</h3>
+          <p>B.Sc. in Computer Science. Thesis: sentiment analysis of the Indonesian election on Twitter and Line Today (84% accuracy).</p>
+        </li>
+        <li>
+          <span class="yr">2017</span>
+          <h3>First blog post</h3>
+          <p>"Belajar Machine Learning", written in Indonesian at midnight because I was bored. The blog never stopped since.</p>
+        </li>
+        <li>
+          <span class="yr">2020</span>
+          <h3>The grind year</h3>
+          <p>64 posts in one year: data science bootcamp notes, pandas exercises, classification, clustering. The farm was real.</p>
+        </li>
+        <li>
+          <span class="yr">2021 – 2022</span>
+          <h3>Expansion pack: Utrecht University</h3>
+          <p>M.Sc. in Applied Data Science in the Netherlands. Thesis on what makes a machine-learning model tick on plumber reviews.</p>
+        </li>
+        <li>
+          <span class="yr">2022 – 2023</span>
+          <h3>Side quest in Amsterdam</h3>
+          <p>Data Science Trainee at In2Intel: dashboards, social-media scraping, and a Digital Twin project on Azure.</p>
+        </li>
+        <li>
+          <span class="yr">2023 – 2024</span>
+          <h3>Joined the guild: Bank Rakyat Indonesia</h3>
+          <p>Leadership trainee program as a Data Science for Audit specialist.</p>
+        </li>
+        <li class="now">
+          <span class="yr">2024 – now</span>
+          <h3>Current chapter</h3>
+          <p>Junior Manager, Data Development and Operation. Building dashboards, risk indicators and an internal search engine for auditors.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Quests + fun facts -->
+    <div class="two">
+      <section class="panel reveal" aria-labelledby="quest-h">
+        <h2 id="quest-h"><i class="fa-solid fa-map" aria-hidden="true"></i> Active quests</h2>
+        <ul class="quests">
+          <li><i class="fa-brands fa-rust" aria-hidden="true"></i> Learn Rust for data analysis, one blog post at a time</li>
+          <li><i class="fa-solid fa-feather" aria-hidden="true"></i> Post short thoughts on Micro Salt more often</li>
+          <li><i class="fa-solid fa-gamepad" aria-hidden="true"></i> Climb the Dota ranks (OpenDota keeps the receipts)</li>
+          <li><i class="fa-solid fa-book" aria-hidden="true"></i> Finish the reading pile: Machiavelli, Rumi, Robert Greene</li>
+          <li class="done"><i class="fa-solid fa-check" aria-hidden="true"></i> Redesign this website (again)</li>
+        </ul>
+      </section>
+
+      <section class="panel reveal" aria-labelledby="facts-h">
+        <h2 id="facts-h"><i class="fa-solid fa-dice" aria-hidden="true"></i> Fun facts <small style="font-size:.75rem;font-weight:400;color:var(--muted)">(tap to reveal)</small></h2>
+        <div class="facts">
+          <button class="fact" type="button" aria-expanded="false">
+            <span class="q">English or Indonesian? <i class="fa-solid fa-plus" aria-hidden="true"></i></span>
+            <span class="a">Both! The very first posts were in Indonesian (with plenty of "gan" and ":v"). These days it's mostly English.</span>
+          </button>
+          <button class="fact" type="button" aria-expanded="false">
+            <span class="q">What's that music on the gate? <i class="fa-solid fa-plus" aria-hidden="true"></i></span>
+            <span class="a">A chill track for chill visitors. There's a mute button in the corner if you're not feeling it.</span>
+          </button>
+          <button class="fact" type="button" aria-expanded="false">
+            <span class="q">Favourite kind of blog post? <i class="fa-solid fa-plus" aria-hidden="true"></i></span>
+            <span class="a">The ones that explain something I just learned, like why correlation is not causation, or why feeling stupid is good for science.</span>
+          </button>
+          <button class="fact" type="button" aria-expanded="false">
+            <span class="q">Dota content? <i class="fa-solid fa-plus" aria-hidden="true"></i></span>
+            <span class="a">Yes: I've written about Dota on the blog, including a piece on Mind_Control's move into coaching.</span>
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Patch notes -->
+    <section class="panel reveal" style="margin-top:22px" aria-labelledby="patch-h">
+      <h2 id="patch-h"><i class="fa-solid fa-code-branch" aria-hidden="true"></i> Latest patch notes</h2>
+      <ul class="patch">
+        <li><b>v2026.11</b> &middot; New "Who am I" page (you are here). Gate got contact buttons.</li>
+        <li><b>v2026.05</b> &middot; Started the Rust for Data Analysis series. Tried predicting BBRI with Prophet.</li>
+        <li><b>v2026.02</b> &middot; Launched Micro Salt for quick notes.</li>
+        <li><b>v2017.10</b> &middot; Initial release: the blog.</li>
+      </ul>
+    </section>
+
+    <!-- Links -->
+    <section class="panel reveal" aria-label="Find me">
+      <div class="links">
+        <a class="btn primary" href="https://saltfarmer.github.io/blog/"><i class="fa-solid fa-blog" aria-hidden="true"></i> Read the blog</a>
+        <a class="btn" href="https://saltfarmer.github.io/micro-salt/"><i class="fa-solid fa-feather" aria-hidden="true"></i> Micro Salt</a>
+        <a class="btn" href="https://www.opendota.com/players/296360583" target="_blank" rel="noopener"><i class="fa-solid fa-table" aria-hidden="true"></i> OpenDota</a>
+        <a class="btn" href="https://www.linkedin.com/in/gama-candra-tri-kartika-18b735106/" target="_blank" rel="noopener"><i class="fa-brands fa-linkedin" aria-hidden="true"></i> LinkedIn</a>
+        <a class="btn" href="../"><i class="fa-solid fa-house" aria-hidden="true"></i> Gate</a>
+      </div>
+    </section>
+
+    <footer>&copy; Saltfarmer &middot; Made with codes, not dotes (this time)</footer>
+  </div>
+
+  <script>
+    // Reveal panels on scroll
+    (function () {
+      var els = document.querySelectorAll('.reveal');
+      if (!('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('in'); }); return; }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+      }, { threshold: 0.12 });
+      els.forEach(function (e) { io.observe(e); });
+      // Safety net: never leave content hidden if the observer doesn't fire
+      setTimeout(function () { els.forEach(function (e) { e.classList.add('in'); }); }, 2500);
+    })();
+
+    // Count-up stats (skipped when the visitor prefers reduced motion)
+    (function () {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var nums = document.querySelectorAll('.num[data-count]');
+      var run = function (el) {
+        var end = +el.getAttribute('data-count'), suf = el.getAttribute('data-suffix') || '', t0 = null;
+        var step = function (t) {
+          if (!t0) t0 = t;
+          var p = Math.min((t - t0) / 1200, 1), v = Math.round(end * (1 - Math.pow(1 - p, 3)));
+          el.textContent = v.toLocaleString('en-US') + suf;
+          if (p < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      };
+      if (!('IntersectionObserver' in window)) return;
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) { if (en.isIntersecting) { run(en.target); io.unobserve(en.target); } });
+      }, { threshold: 0.6 });
+      nums.forEach(function (n) { io.observe(n); });
+    })();
+
+    // Fun-fact toggles
+    document.querySelectorAll('.fact').forEach(function (b) {
+      b.addEventListener('click', function () {
+        b.setAttribute('aria-expanded', b.getAttribute('aria-expanded') === 'true' ? 'false' : 'true');
+      });
+    });
+  </script>
+</body>
+</html>
