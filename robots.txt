@@ -1,6 +1,6 @@
 # robots.txt for saltfarmer.github.io (covers /blog and /micro-salt too)
 
-# AI scrapers and archive bots: keep out of the resume page.
+# AI scrapers and archive bots: keep out of the resume page (/cv/).
 User-agent: GPTBot
 User-agent: ChatGPT-User
 User-agent: OAI-SearchBot
@@ -18,9 +18,10 @@ User-agent: cohere-ai
 User-agent: Diffbot
 User-agent: ia_archiver
 User-agent: archive.org_bot
+Disallow: /cv/
 Disallow: /resume/
 
-# Search engines may crawl everything; /resume/ carries a "noindex" tag,
+# Search engines may crawl everything; /cv/ carries a "noindex" tag,
 # so they read it, see the tag, and leave it out of search results.
 User-agent: *
 Allow: /
