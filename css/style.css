@@ -220,32 +220,45 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* ---- Stickers: Dudu working (left), Bubu & Dudu on the scooter (right) ---- */
-.sticker {
-  position: fixed;
-  bottom: 10px;
-  z-index: 1;
-  display: none;
-  height: auto;
+/* Small and medium screens: a row under the contact buttons */
+.stickers {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 420px;
+  margin-top: 26px;
   pointer-events: none;
+}
+.sticker {
+  height: auto;
   filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.35));
 }
 .sticker--left {
-  left: 18px;
-  width: clamp(150px, 15vw, 230px);
-  animation: sticker-breathe 3.2s ease-in-out infinite;
+  width: 48%;
+  max-width: 200px;
   transform-origin: bottom center;
+  animation: sticker-breathe 3.2s ease-in-out infinite;
 }
 .sticker--right {
-  right: 78px; /* keeps the music button in the corner clear */
-  width: clamp(130px, 12.5vw, 195px);
+  width: 38%;
+  max-width: 165px;
   animation: sticker-ride 0.7s ease-in-out infinite alternate;
 }
 @keyframes sticker-breathe { 50% { transform: scale(1.02); } }
 @keyframes sticker-ride { to { transform: translateY(-4px) rotate(-1deg); } }
 
-/* Only where there is room beside the cards */
+/* Wide screens with room beside the cards: pinned to the bottom corners */
 @media (min-width: 1100px) and (min-height: 640px) {
-  .sticker { display: block; }
+  .stickers { display: contents; }
+  .sticker {
+    position: fixed;
+    bottom: 10px;
+    z-index: 1;
+    max-width: none;
+  }
+  .sticker--left { left: 18px; width: clamp(150px, 15vw, 230px); }
+  .sticker--right { right: 78px; width: clamp(130px, 12.5vw, 195px); } /* clears the music button */
 }
 
 /* ---- Logo, top left ---- */
