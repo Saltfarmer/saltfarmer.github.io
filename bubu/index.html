@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#042A61">
+  <meta name="description" content="Bubu Adventure: a tiny platformer. Throw stones, kick, and jump on the Dudu monsters.">
+  <title>Bubu Adventure | Saltfarmer</title>
+  <link rel="icon" href="../img/favicon.png" type="image/png" sizes="48x48">
+  <style>
+    @font-face { font-family: "Inter"; font-weight: 400; font-display: swap; src: url("../fonts/inter-Regular.woff") format("woff"); }
+    @font-face { font-family: "Inter"; font-weight: 700; font-display: swap; src: url("../fonts/inter-Bold.woff") format("woff"); }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+      padding: 12px; min-height: 100dvh;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: #fff;
+      background: radial-gradient(ellipse at 20% 10%, rgba(113,197,232,.25), transparent 55%), linear-gradient(160deg, #042A61, #0B1F45 60%, #0a0f1f);
+      -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+    }
+    .top { width: min(100%, 960px); display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+    .top a { color: #71C5E8; text-decoration: none; font-weight: 700; }
+    .top span { color: rgba(255,255,255,.7); }
+    .stage { width: min(100%, 960px, calc((100dvh - 150px) * 16 / 9)); }
+    canvas {
+      display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: 14px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.45); border: 2px solid rgba(113,197,232,.35);
+      touch-action: none; outline: none; background: #BFE6FA;
+    }
+    /* Touch controls (shown on touch screens) */
+    .pad { display: none; width: min(100%, 960px); justify-content: space-between; gap: 10px; }
+    .pad div { display: flex; gap: 10px; }
+    .pad button {
+      width: 64px; height: 64px; border-radius: 50%; border: 2px solid rgba(113,197,232,.6);
+      background: rgba(255,255,255,.1); color: #fff; font: 700 13px Inter, system-ui, sans-serif;
+      touch-action: none;
+    }
+    .pad button.on { background: rgba(48,127,226,.55); }
+    .pad .jump { width: 74px; height: 74px; background: rgba(8,87,195,.5); }
+    @media (pointer: coarse) { .pad { display: flex; } .keys { display: none; } }
+    .keys { font-size: 12px; color: rgba(255,255,255,.6); text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <a href="../">&larr; Back to the gate</a>
+    <span>Bubu Adventure</span>
+  </div>
+  <div class="stage">
+    <canvas id="game" tabindex="0" aria-label="Bubu Adventure game"></canvas>
+  </div>
+  <div class="pad" aria-hidden="true">
+    <div>
+      <button type="button" data-act="left">&#9664;</button>
+      <button type="button" data-act="right">&#9654;</button>
+    </div>
+    <div>
+      <button type="button" data-act="throw">Throw</button>
+      <button type="button" data-act="kick">Kick</button>
+      <button type="button" class="jump" data-act="jump">Jump</button>
+    </div>
+  </div>
+  <p class="keys">&larr; &rarr; move &middot; Space jump &middot; J throw &middot; K kick &middot; P pause</p>
+  <script src="game.js"></script>
+  <script>document.getElementById('game').focus();</script>
+</body>
+</html>

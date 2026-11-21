@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0857C3">
+  <title>Page not found | Saltfarmer</title>
+  <link rel="icon" href="/img/favicon.png" type="image/png" sizes="48x48">
+  <style>
+    @font-face { font-family: "Inter"; font-weight: 400; font-display: swap; src: url("/fonts/inter-Regular.woff") format("woff"); }
+    @font-face { font-family: "Inter"; font-weight: 700; font-display: swap; src: url("/fonts/inter-Bold.woff") format("woff"); }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; min-height: 100dvh;
+      display: flex; align-items: center; justify-content: center; padding: 24px;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: #fff; text-align: center;
+      background:
+        radial-gradient(ellipse at 20% 15%, rgba(113, 197, 232, 0.28) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 90%, rgba(48, 127, 226, 0.30) 0%, transparent 50%),
+        linear-gradient(160deg, #042A61 0%, #0B1F45 55%, #111 100%);
+    }
+    main { max-width: 520px; }
+    img { width: min(240px, 60vw); height: auto; filter: drop-shadow(0 10px 18px rgba(0,0,0,.35)); }
+    h1 { font-size: clamp(3rem, 12vw, 5rem); margin: 8px 0 0; letter-spacing: -0.04em; }
+    p { color: rgba(255,255,255,.78); line-height: 1.6; margin: 8px 0 24px; }
+    .btns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 999px;
+      font: 600 0.95rem Inter, system-ui, sans-serif; color: #fff; text-decoration: none; cursor: pointer;
+      background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.2);
+    }
+    .btn.primary { background: #0857C3; border-color: #0857C3; }
+    .btn:hover { border-color: #71C5E8; }
+    .btn:focus-visible { outline: 2px solid #71C5E8; outline-offset: 3px; }
+  </style>
+</head>
+<body>
+  <main>
+    <img src="/img/dudu-working.webp" alt="" width="440" height="346">
+    <h1>404</h1>
+    <p>Dudu searched everywhere, but this page doesn't exist. While you're here, want to play a game?</p>
+    <div class="btns">
+      <button type="button" class="btn primary" data-arcade>🕹️ Play a game</button>
+      <a class="btn" href="/">Home</a>
+      <a class="btn" href="/blog/">Blog</a>
+    </div>
+  </main>
+  <script src="/js/easter.js?v=20261121b"></script>
+</body>
+</html>
