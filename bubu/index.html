@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#042A61">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="description" content="Bubu Adventure: a tiny platformer. Throw stones, kick, and jump on the Dudu monsters.">
+  <title>Bubu Adventure | Saltfarmer</title>
+  <link rel="icon" href="../img/favicon.png" type="image/png" sizes="48x48">
+  <style>
+    @font-face { font-family: "Inter"; font-weight: 400; font-display: swap; src: url("../fonts/inter-Regular.woff") format("woff"); }
+    @font-face { font-family: "Inter"; font-weight: 700; font-display: swap; src: url("../fonts/inter-Bold.woff") format("woff"); }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+      padding: 12px; min-height: 100dvh;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: #fff;
+      background: radial-gradient(ellipse at 20% 10%, rgba(113,197,232,.25), transparent 55%), linear-gradient(160deg, #042A61, #0B1F45 60%, #0a0f1f);
+      -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; overscroll-behavior: none;
+    }
+    .top { width: min(100%, 960px); display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 14px; }
+    .top a { color: #71C5E8; text-decoration: none; font-weight: 700; }
+    .top .name { color: rgba(255,255,255,.7); }
+    .tools { display: flex; gap: 8px; }
+    .tools button {
+      width: 36px; height: 36px; border-radius: 10px; border: 1px solid rgba(113,197,232,.45);
+      background: rgba(255,255,255,.08); color: #fff; font-size: 16px; line-height: 1; cursor: pointer;
+    }
+    .tools .touch-only { display: none; }
+    .tools .full-btn { width: auto; padding: 0 12px; display: inline-flex; align-items: center; gap: 6px; font: 700 13px Inter, system-ui, sans-serif; background: #0857C3; border-color: #0857C3; }
+    .tools .full-btn .ico { font-size: 16px; }
+    .stage { position: relative; width: min(100%, 960px, calc((100dvh - 150px) * 16 / 9)); }
+    canvas {
+      display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: 14px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.45); border: 2px solid rgba(113,197,232,.35);
+      touch-action: none; outline: none; background: #BFE6FA;
+    }
+    .toast {
+      position: absolute; left: 50%; top: 14%; transform: translateX(-50%);
+      background: rgba(4,42,97,.85); color: #fff; font-weight: 700; font-size: 13px;
+      padding: 6px 12px; border-radius: 999px; opacity: 0; transition: opacity .2s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+    .keys { font-size: 12px; color: rgba(255,255,255,.6); text-align: center; margin: 0; }
+    .rotate { display: none; font-size: 13px; color: rgba(255,255,255,.75); text-align: center; margin: 0; }
+
+    /* Touch controls */
+    .pad { display: none; width: min(100%, 960px); justify-content: space-between; align-items: flex-end; gap: 10px; }
+    .pad .cluster { display: flex; gap: 10px; align-items: flex-end; }
+    .pad button {
+      width: 66px; height: 66px; border-radius: 50%; border: 2px solid rgba(113,197,232,.7);
+      background: rgba(255,255,255,.12); color: #fff; font: 700 13px Inter, system-ui, sans-serif;
+      touch-action: none; padding: 0;
+    }
+    .pad button.on { background: rgba(48,127,226,.6); transform: scale(.94); }
+    .pad .jump { width: 80px; height: 80px; background: rgba(8,87,195,.55); font-size: 15px; }
+
+    @media (pointer: coarse) {
+      html, body { overflow: hidden; }
+      .pad { display: flex; }
+      .keys { display: none; }
+      .tools .touch-only { display: inline-block; }
+    }
+    /* Phone held sideways: game fills the screen, buttons float over the corners */
+    @media (pointer: coarse) and (orientation: landscape) {
+      body { padding: 0; gap: 0; }
+      .stage { width: min(100vw, calc(100dvh * 16 / 9)); }
+      canvas { border-radius: 0; border: 0; box-shadow: none; }
+      .top {
+        position: fixed; z-index: 5; bottom: max(10px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+        width: auto; font-size: 12px;
+      }
+      .top .name { display: none; }
+      .top a { background: rgba(4,42,97,.55); padding: 8px 10px; border-radius: 10px; }
+      .pad {
+        position: fixed; z-index: 4; left: 0; right: 0; bottom: 0; width: auto;
+        padding: 0 max(14px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+        pointer-events: none;
+      }
+      .pad button { pointer-events: auto; background: rgba(4,42,97,.35); width: 60px; height: 60px; }
+      .pad .jump { width: 72px; height: 72px; background: rgba(8,87,195,.45); }
+    }
+    /* Phone held upright: game on top, big buttons below */
+    @media (pointer: coarse) and (orientation: portrait) {
+      body { justify-content: flex-start; padding-top: max(14px, env(safe-area-inset-top)); }
+      .stage { width: 100%; }
+      .rotate { display: block; }
+      .pad { margin-top: auto; gap: 3vw; padding-bottom: max(18px, env(safe-area-inset-bottom)); }
+      .pad .cluster { gap: 2.5vw; }
+      .pad button { width: min(70px, 16vw); height: min(70px, 16vw); font-size: min(13px, 3.2vw); }
+      .pad .jump { width: min(84px, 19vw); height: min(84px, 19vw); }
+    }
+    /* ---- Full screen (real full screen, or "maximised" where browsers don't allow it, e.g. iPhone) ---- */
+    html.is-full, html.is-full body { overflow: hidden; }
+    html.is-full body { padding: 0; gap: 0; justify-content: center; background: #000; }
+    html.is-full .stage { width: min(100vw, calc(100dvh * 16 / 9)); }
+    html.is-full canvas { border-radius: 0; border: 0; box-shadow: none; }
+    html.is-full .keys, html.is-full .rotate, html.is-full .top .name { display: none; }
+    html.is-full .top {
+      position: fixed; z-index: 6; top: max(8px, env(safe-area-inset-top)); right: max(8px, env(safe-area-inset-right));
+      left: auto; bottom: auto; transform: none; width: auto; opacity: .75;
+    }
+    html.is-full .top:hover { opacity: 1; }
+    html.is-full .top a { display: none; }
+    html.is-full .tools .full-btn .lbl { display: none; }
+    html.is-full .tools .full-btn { padding: 0; width: 36px; justify-content: center; }
+    @media (pointer: coarse) {
+      .tools .full-btn .lbl { display: none; }
+      .tools .full-btn { padding: 0 10px; }
+      html.is-full .pad {
+        position: fixed; z-index: 4; left: 0; right: 0; bottom: 0; width: auto; margin: 0;
+        padding: 0 max(14px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+        pointer-events: none;
+      }
+      html.is-full .pad button { pointer-events: auto; background: rgba(4,42,97,.35); }
+    }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <a href="../">&larr; Gate</a>
+    <span class="name">Bubu Adventure</span>
+    <div class="tools">
+      <button type="button" class="touch-only" data-act="pause" aria-label="Pause">&#10074;&#10074;</button>
+      <button type="button" id="btn-sound" aria-label="Turn sound off">&#128266;</button>
+      <button type="button" id="btn-full" class="full-btn" aria-label="Full screen"><span class="ico">&#x26F6;</span><span class="lbl">Full screen</span></button>
+    </div>
+  </div>
+  <div class="stage">
+    <canvas id="game" tabindex="0" aria-label="Bubu Adventure game"></canvas>
+    <div class="toast" id="toast" role="status"></div>
+  </div>
+  <p class="rotate">Turn your phone sideways for a bigger screen &#8635;</p>
+  <div class="pad" aria-hidden="true">
+    <div class="cluster">
+      <button type="button" data-act="left">&#9664;</button>
+      <button type="button" data-act="right">&#9654;</button>
+    </div>
+    <div class="cluster">
+      <button type="button" data-act="throw">Throw</button>
+      <button type="button" data-act="kick">Kick</button>
+      <button type="button" class="jump" data-act="jump">Jump</button>
+    </div>
+  </div>
+  <p class="keys">&larr; &rarr; move &middot; Space jump &middot; J throw &middot; K kick &middot; P pause &middot; M sound &middot; F full screen</p>
+  <script src="game.js"></script>
+  <script>document.getElementById('game').focus();</script>
+</body>
+</html>
