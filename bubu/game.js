@@ -24,7 +24,7 @@
   };
   if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) {
     HINTS = {
-      '1': ['\u25c0 \u25b6  walk', 'Jump button'],
+      '1': ['Drag left: walk', 'Tap screen: jump'],
       '2': ['Throw button', 'throw a stone'],
       '3': ['Kick button', 'kick!'],
       '4': ['Jump on Dudu', 'for big damage']
@@ -200,10 +200,10 @@
   function release(a) { held[a] = false; }
   function took(a) { var p = pressed[a]; pressed[a] = false; return p; }
 
-  // Touch buttons
+  // Touch: action buttons
   document.querySelectorAll('[data-act]').forEach(function (b) {
     var a = b.getAttribute('data-act');
-    b.addEventListener('pointerdown', function (e) { e.preventDefault(); b.setPointerCapture(e.pointerId); press(a); b.classList.add('on'); });
+    b.addEventListener('pointerdown', function (e) { e.preventDefault(); e.stopPropagation(); b.setPointerCapture(e.pointerId); Sfx.init(); press(a); b.classList.add('on'); });
     ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (ev) {
       b.addEventListener(ev, function () { release(a); b.classList.remove('on'); });
     });
@@ -211,6 +211,53 @@
   canvas.addEventListener('pointerdown', function () {
     if (state === 'title' || state === 'over' || state === 'win' || state === 'clear') pressed.start = true;
   });
+
+  // Touch: floating analog stick (bottom-left) + tap anywhere else to jump
+  var stickAxis = 0;
+  (function () {
+    var layer = document.getElementById('touch-layer'), stick = document.getElementById('stick'), knob = document.getElementById('stick-knob');
+    if (!layer || !stick) return;
+    var sid = null, ox = 0, oy = 0, jumpers = {}, nJump = 0;
+    function radius() { return stick.offsetWidth / 2 || 62; }
+    function inStickZone(x, y) {
+      var w = innerWidth, h = innerHeight;
+      if (x > w * 0.42) return false;
+      if (h > w) { var r = canvas.getBoundingClientRect(); return y > r.bottom + 4; } // upright: area under the game
+      return y > h * 0.3;                                                              // sideways: lower-left of screen
+    }
+    function setKnob(dx, dy) {
+      var R = radius(), d = Math.hypot(dx, dy);
+      if (d > R) { // the base follows the thumb when it drags past the edge
+        var k = (d - R) / d; ox += dx * k; oy += dy * k; dx -= dx * k; dy -= dy * k;
+        stick.style.left = ox + 'px'; stick.style.top = oy + 'px';
+      }
+      knob.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+      var n = dx / R, a = Math.abs(n), DEAD = 0.18, FULL = 0.85;  // analog: small push = slow walk
+      stickAxis = a < DEAD ? 0 : Math.sign(n) * Math.min(1, (a - DEAD) / (FULL - DEAD));
+    }
+    function endStick() {
+      sid = null; stickAxis = 0; stick.classList.remove('on');
+      stick.style.left = stick.style.top = ''; knob.style.transform = '';
+    }
+    layer.addEventListener('pointerdown', function (e) {
+      e.preventDefault(); Sfx.init();
+      if (state !== 'play' || paused) { if (!paused) pressed.start = true; return; }
+      layer.setPointerCapture(e.pointerId);
+      if (sid === null && inStickZone(e.clientX, e.clientY)) {
+        sid = e.pointerId; ox = e.clientX; oy = e.clientY;
+        stick.style.left = ox + 'px'; stick.style.top = oy + 'px'; stick.classList.add('on'); setKnob(0, 0);
+      } else if (!jumpers[e.pointerId]) {
+        jumpers[e.pointerId] = 1; nJump++; press('jump');
+      }
+    });
+    layer.addEventListener('pointermove', function (e) { if (e.pointerId === sid) setKnob(e.clientX - ox, e.clientY - oy); });
+    function up(e) {
+      if (e.pointerId === sid) endStick();
+      if (jumpers[e.pointerId]) { delete jumpers[e.pointerId]; if (--nJump <= 0) { nJump = 0; release('jump'); } }
+    }
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (ev) { layer.addEventListener(ev, up); });
+    window.addEventListener('blur', function () { endStick(); jumpers = {}; nJump = 0; release('jump'); });
+  })();
 
   var TOUCH = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
   var toastEl = document.getElementById('toast');
@@ -516,6 +563,7 @@
     if (p.throwT > 0.36) p.throwT = 0;
 
     var dir = (held.right ? 1 : 0) - (held.left ? 1 : 0);
+    if (dir === 0 && stickAxis) dir = stickAxis; // analog stick: speed follows how far it is pushed
     if (p.hurtT > 0) dir = 0;
     p.safeT = Math.max(0, (p.safeT || 0) - dt);
     p.calm = (p.calm || 0) + dt; if (!p.nextSing) p.nextSing = 5;
@@ -526,7 +574,7 @@
     var acc = p.ground ? ACC : AIR_ACC;
     if (dir !== 0) {
       p.vx += clamp(target - p.vx, -acc * dt, acc * dt);
-      if (p.kickT === 0 && p.throwT === 0) p.face = dir;
+      if (p.kickT === 0 && p.throwT === 0) p.face = dir > 0 ? 1 : -1;
     } else if (p.ground && p.hurtT === 0) {
       p.vx -= clamp(p.vx, -FRICTION * dt, FRICTION * dt);
     }
@@ -1045,7 +1093,7 @@
     text('Throw stones, kick, and jump on the Dudu monsters!', VW / 2, 108, 13, OUTLINE, 'center', 700, 'rgba(255,255,255,.9)');
     var blink = Math.floor(stateT * 2) % 2 === 0;
     if (blink) text(TOUCH ? 'Tap to start' : 'Press Enter or tap to start', VW / 2, 150, 16, '#0857C3', 'center', 800, '#ffffff');
-    var lines = TOUCH ? ['Use the buttons on screen', '\u25c0 \u25b6 move \u00b7 Jump \u00b7 Throw \u00b7 Kick'] : ['\u2190 \u2192 / A D  move', 'Space / \u2191  jump', 'J / Z  throw  \u00b7  K / X  kick', 'P  pause  \u00b7  M  sound  \u00b7  F  full screen'];
+    var lines = TOUCH ? ['Left thumb: drag to move (push further = faster)', 'Tap anywhere to jump \u00b7 Throw \u00b7 Kick'] : ['\u2190 \u2192 / A D  move', 'Space / \u2191  jump', 'J / Z  throw  \u00b7  K / X  kick', 'P  pause  \u00b7  M  sound  \u00b7  F  full screen'];
     lines.forEach(function (l, i) { text(l, VW / 2, 190 + i * 17, 11, OUTLINE, 'center', 600, 'rgba(255,255,255,.85)'); });
     var best = store('bubu-best');
     if (best && best.score) text('Best score ' + best.score + (best.time ? ' · best clear ' + fmtTime(best.time) : ''), VW / 2, 268, 11, '#7A5444', 'center', 700, 'rgba(255,255,255,.85)');

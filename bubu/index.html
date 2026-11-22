@@ -47,24 +47,63 @@
     .keys { font-size: 12px; color: rgba(255,255,255,.6); text-align: center; margin: 0; }
     .rotate { display: none; font-size: 13px; color: rgba(255,255,255,.75); text-align: center; margin: 0; }
 
-    /* Touch controls */
-    .pad { display: none; width: min(100%, 960px); justify-content: space-between; align-items: flex-end; gap: 10px; }
-    .pad .cluster { display: flex; gap: 10px; align-items: flex-end; }
-    .pad button {
-      width: 66px; height: 66px; border-radius: 50%; border: 2px solid rgba(113,197,232,.7);
-      background: rgba(255,255,255,.12); color: #fff; font: 700 13px Inter, system-ui, sans-serif;
-      touch-action: none; padding: 0;
+    /* ---- Touch controls (competitive-mobile style) ----
+       left: floating analog stick that appears where the thumb lands
+       right: big Jump in the corner, Kick + Throw on an arc around it
+       anywhere else on screen: tap = jump (hold for a higher jump) */
+    .touch-layer, .pad { display: none; }
+    .pad { --u: 1; position: fixed; inset: 0; z-index: 4; pointer-events: none; }
+    .touch-layer { position: fixed; inset: 0; z-index: 3; touch-action: none; }
+    .stick {
+      --r: calc(62px * var(--u));
+      position: fixed; width: calc(var(--r) * 2); height: calc(var(--r) * 2); margin: calc(var(--r) * -1) 0 0 calc(var(--r) * -1);
+      left: calc(max(24px, env(safe-area-inset-left)) + var(--r) + 8px); top: calc(100dvh - max(20px, env(safe-area-inset-bottom)) - var(--r) - 12px);
+      border-radius: 50%; border: 2px solid rgba(113,197,232,.55);
+      background: radial-gradient(circle, rgba(4,42,97,.10) 0 55%, rgba(4,42,97,.32) 56% 100%);
+      opacity: .45; transition: opacity .15s;
     }
-    .pad button.on { background: rgba(48,127,226,.6); transform: scale(.94); }
-    .pad .jump { width: 80px; height: 80px; background: rgba(8,87,195,.55); font-size: 15px; }
+    .stick.on { opacity: .95; transition: none; }
+    .stick::before, .stick::after { /* direction ticks */
+      content: ""; position: absolute; top: 50%; width: 0; height: 0; margin-top: -6px;
+      border-top: 6px solid transparent; border-bottom: 6px solid transparent;
+    }
+    .stick::before { left: 8px; border-right: 8px solid rgba(255,255,255,.55); }
+    .stick::after { right: 8px; border-left: 8px solid rgba(255,255,255,.55); }
+    .stick-knob {
+      position: absolute; left: 50%; top: 50%; width: calc(var(--r) * .9); height: calc(var(--r) * .9);
+      margin: calc(var(--r) * -.45) 0 0 calc(var(--r) * -.45); border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #71C5E8, #307FE2 60%, #0857C3);
+      border: 2px solid rgba(255,255,255,.85); box-shadow: 0 4px 14px rgba(0,0,0,.35);
+    }
+    .actions {
+      --j: calc(88px * var(--u)); --s: calc(62px * var(--u));
+      position: fixed; right: max(18px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom));
+      width: calc(var(--j) + var(--s) * 1.55); height: calc(var(--j) + var(--s) * 1.55);
+    }
+    .act {
+      position: absolute; pointer-events: auto; touch-action: none; padding: 0; border-radius: 50%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+      color: #fff; font: 800 calc(11px * var(--u)) Inter, system-ui, sans-serif; letter-spacing: .02em;
+      border: 2px solid rgba(255,255,255,.7); box-shadow: 0 4px 14px rgba(0,0,0,.3), inset 0 -4px 0 rgba(0,0,0,.18);
+      transition: transform .06s;
+    }
+    .act .i { font-size: calc(18px * var(--u)); line-height: 1; }
+    .act.on { transform: scale(.9); filter: brightness(1.25); }
+    .act.jump { right: 0; bottom: 0; width: var(--j); height: var(--j); background: radial-gradient(circle at 35% 30%, #307FE2, #0857C3 70%); font-size: calc(13px * var(--u)); }
+    .act.jump .i { font-size: calc(26px * var(--u)); }
+    .act.kick, .act.throw { width: var(--s); height: var(--s); background: radial-gradient(circle at 35% 30%, rgba(232,162,113,.95), rgba(195,116,8,.9) 70%); }
+    .act.kick { right: calc(var(--j) + var(--s) * .32); bottom: calc(var(--j) * .02); }       /* left of Jump */
+    .act.throw { right: calc(var(--j) * .5); bottom: calc(var(--j) + var(--s) * .34); background: radial-gradient(circle at 35% 30%, rgba(113,197,232,.95), rgba(48,127,226,.9) 70%); } /* above Jump */
+    .act.throw .i { font-size: calc(14px * var(--u)); }
 
     @media (pointer: coarse) {
       html, body { overflow: hidden; }
-      .pad { display: flex; }
+      .pad, .touch-layer { display: block; }
       .keys { display: none; }
       .tools .touch-only { display: inline-block; }
+      .top { position: relative; z-index: 5; }
     }
-    /* Phone held sideways: game fills the screen, buttons float over the corners */
+    /* Phone held sideways: game fills the screen, controls float over the corners */
     @media (pointer: coarse) and (orientation: landscape) {
       body { padding: 0; gap: 0; }
       .stage { width: min(100vw, calc(100dvh * 16 / 9)); }
@@ -75,23 +114,16 @@
       }
       .top .name { display: none; }
       .top a { background: rgba(4,42,97,.55); padding: 8px 10px; border-radius: 10px; }
-      .pad {
-        position: fixed; z-index: 4; left: 0; right: 0; bottom: 0; width: auto;
-        padding: 0 max(14px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
-        pointer-events: none;
-      }
-      .pad button { pointer-events: auto; background: rgba(4,42,97,.35); width: 60px; height: 60px; }
-      .pad .jump { width: 72px; height: 72px; background: rgba(8,87,195,.45); }
+      .act { background-blend-mode: normal; opacity: .9; }
     }
-    /* Phone held upright: game on top, big buttons below */
+    /* Phone held upright: game on top, bigger controls in the empty space below */
     @media (pointer: coarse) and (orientation: portrait) {
       body { justify-content: flex-start; padding-top: max(14px, env(safe-area-inset-top)); }
       .stage { width: 100%; }
       .rotate { display: block; }
-      .pad { margin-top: auto; gap: 3vw; padding-bottom: max(18px, env(safe-area-inset-bottom)); }
-      .pad .cluster { gap: 2.5vw; }
-      .pad button { width: min(70px, 16vw); height: min(70px, 16vw); font-size: min(13px, 3.2vw); }
-      .pad .jump { width: min(84px, 19vw); height: min(84px, 19vw); }
+      .pad { --u: 1.15; }
+      .stick { top: calc(100dvh - max(36px, env(safe-area-inset-bottom)) - var(--r) - 40px); }
+      .actions { bottom: max(36px, env(safe-area-inset-bottom)); }
     }
     /* ---- Full screen (real full screen, or "maximised" where browsers don't allow it, e.g. iPhone) ---- */
     html.is-full, html.is-full body { overflow: hidden; }
@@ -110,12 +142,12 @@
     @media (pointer: coarse) {
       .tools .full-btn .lbl { display: none; }
       .tools .full-btn { padding: 0 10px; }
-      html.is-full .pad {
-        position: fixed; z-index: 4; left: 0; right: 0; bottom: 0; width: auto; margin: 0;
-        padding: 0 max(14px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
-        pointer-events: none;
-      }
-      html.is-full .pad button { pointer-events: auto; background: rgba(4,42,97,.35); }
+      html.is-full .pad { --u: 1.25; }
+      html.is-full .top { opacity: .85; top: auto; right: auto; left: 50%; transform: translateX(-50%); bottom: max(10px, env(safe-area-inset-bottom)); } /* between stick and buttons, clear of the score */
+      html.is-full .tools { gap: 10px; }
+      html.is-full .tools button { width: 46px; height: 46px; border-radius: 12px; font-size: 20px; background: rgba(4,42,97,.55); }
+      html.is-full .tools .full-btn { width: 46px; padding: 0; background: #0857C3; }
+      html.is-full .tools .full-btn .ico { font-size: 20px; }
     }
   </style>
 </head>
@@ -134,15 +166,14 @@
     <div class="toast" id="toast" role="status"></div>
   </div>
   <p class="rotate">Turn your phone sideways for a bigger screen &#8635;</p>
+  <!-- Touch controls: floating analog stick (left), action buttons (right), tap anywhere else = jump -->
+  <div class="touch-layer" id="touch-layer" aria-hidden="true"></div>
   <div class="pad" aria-hidden="true">
-    <div class="cluster">
-      <button type="button" data-act="left">&#9664;</button>
-      <button type="button" data-act="right">&#9654;</button>
-    </div>
-    <div class="cluster">
-      <button type="button" data-act="throw">Throw</button>
-      <button type="button" data-act="kick">Kick</button>
-      <button type="button" class="jump" data-act="jump">Jump</button>
+    <div class="stick" id="stick"><div class="stick-knob" id="stick-knob"></div></div>
+    <div class="actions">
+      <button type="button" class="act throw" data-act="throw"><span class="i">&#9679;</span><span class="t">Throw</span></button>
+      <button type="button" class="act kick" data-act="kick"><span class="i">&#10148;</span><span class="t">Kick</span></button>
+      <button type="button" class="act jump" data-act="jump"><span class="i">&#9650;</span><span class="t">Jump</span></button>
     </div>
   </div>
   <p class="keys">&larr; &rarr; move &middot; Space jump &middot; J throw &middot; K kick &middot; P pause &middot; M sound &middot; F full screen</p>
