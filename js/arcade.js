@@ -1,4 +1,4 @@
-/* Saltfarmer Arcade: Last Hit Trainer + Data Janitor.
+/* Saltfarmer Arcade: menu + Data Janitor (Last Hit Trainer and Bubu Adventure have their own pages).
    Loaded on demand by easter.js (arrow code, 5 logo clicks, or the 404 page).
    No dependencies, no network, scores stay in this browser (localStorage). */
 (function () {
@@ -104,11 +104,11 @@
     box.appendChild(p);
     var menu = el('div', 'arc-menu');
     [
-      { id: 'lasthit', name: '⚔️ Last Hit Trainer', desc: 'Your allies chip away at the creeps. Strike when their HP drops below your damage. Deny your own creeps too.', start: LastHit },
+      { id: 'lasthit', name: '⚔️ Last Hit Trainer', desc: 'A Dota-style mid lane. Pick Radiant or Dire, last hit and deny with right-click, pull creep aggro, and out-farm the enemy mid.', href: '/lasthit/', bestKey: 'bw-arcade-lasthit' },
       { id: 'janitor', name: '🧹 Data Janitor', desc: 'Rows rain down from the database. Catch the dirty ones (NaN, null, -999, outliers). Let clean data pass.', start: Janitor },
       { id: 'bubu', name: '🐼 Bubu Adventure', desc: 'A 3-level platformer. Throw stones, kick, and jump on the Dudu monsters, then face the boss.', href: '/bubu/' }
     ].forEach(function (g) {
-      var best = g.href ? (function () { try { var b = JSON.parse(localStorage.getItem('bubu-best') || 'null'); return b && b.score ? b.score : 0; } catch (e) { return 0; } })() : getBest(g.id);
+      var best = g.bestKey ? getBest(g.id) : g.href ? (function () { try { var b = JSON.parse(localStorage.getItem('bubu-best') || 'null'); return b && b.score ? b.score : 0; } catch (e) { return 0; } })() : getBest(g.id);
       var c = el('button', 'arc-card', '<b>' + g.name + '</b><small>' + g.desc + '</small><em>' + (g.href ? 'Opens its own page · best ' + best : 'Best: ' + best) + '</em>');
       c.type = 'button';
       c.addEventListener('click', function () { if (g.href) location.href = g.href; else startGame(g); });
@@ -179,196 +179,6 @@
   }
   function rand(a, b) { return a + Math.random() * (b - a); }
   function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
-
-  /* =====================================================================
-     GAME 1: LAST HIT TRAINER
-     Allies (and enemies) hit creeps every so often. Your attack has a
-     wind-up + projectile delay, so you must predict the HP at impact.
-     Enemy creep (red): last hit when HP <= your damage at impact.
-     Allied creep (teal): deny when HP < 50% and <= your damage.
-     ===================================================================== */
-  function LastHit(canvas, info, help, id) {
-    var ctx = setupCanvas(canvas);
-    var DMG = 52, WINDUP = 0.30, FLY = 0.25, ROUND = 60;
-    var creeps, shots, floats, time, lh, denies, missed, early, gold, state, best, stopLoop, hover = null;
-
-    help.innerHTML = 'Click or tap a creep to attack. Your hit lands about <b>0.55s</b> later for <b>' + DMG + '</b> damage, so attack a little before the HP gets low. ' +
-      '<b>Red</b> = enemy (last hit for gold). <b>Teal</b> = yours (deny below 50% HP). 60-second round. <kbd>Esc</kbd> = back.';
-
-    function slot(side, i) { return { x: side === 'enemy' ? 95 + i * 112 : 151 + i * 112, y: side === 'enemy' ? 120 : 250 }; }
-    function spawn(side, i) {
-      var p = slot(side, i);
-      return { side: side, i: i, x: p.x, y: p.y, hp: 420, max: 420, next: rand(0.4, 1.4), dead: false, respawn: 0, flash: 0 };
-    }
-    function reset() {
-      creeps = [];
-      for (var i = 0; i < 5; i++) creeps.push(spawn('enemy', i));
-      for (var j = 0; j < 4; j++) creeps.push(spawn('ally', j));
-      shots = []; floats = []; time = ROUND; lh = 0; denies = 0; missed = 0; early = 0; gold = 0; state = 'ready';
-      best = getBest(id);
-      updateInfo();
-    }
-    function updateInfo() {
-      var tries = lh + missed;
-      var acc = tries ? Math.round(lh / tries * 100) : 0;
-      info.textContent = 'LH ' + lh + ' · Denies ' + denies + ' · Missed ' + missed + ' · Accuracy ' + acc + '% · Best ' + best;
-    }
-    function float(x, y, s, color) { floats.push({ x: x, y: y, s: s, c: color, t: 1 }); }
-
-    function creepAt(p) {
-      for (var k = 0; k < creeps.length; k++) {
-        var c = creeps[k];
-        if (!c.dead && Math.abs(p.x - c.x) < 40 && Math.abs(p.y - c.y) < 40) return c;
-      }
-      return null;
-    }
-    function attack(c) {
-      if (state === 'over') return;
-      if (state === 'ready') state = 'play';
-      if (shots.some(function (s) { return s.phase !== 'done'; })) return; // one attack at a time
-      shots.push({ target: c, phase: 'windup', t: WINDUP, x: W / 2, y: H - 28 });
-    }
-    function onDown(e) {
-      e.preventDefault();
-      var c = creepAt(toLocal(canvas, e));
-      if (state === 'over') { reset(); return; }
-      if (c) attack(c); else if (state === 'ready') state = 'play';
-    }
-    function onMove(e) { hover = creepAt(toLocal(canvas, e)); }
-    canvas.addEventListener('pointerdown', onDown);
-    canvas.addEventListener('pointermove', onMove);
-
-    function impact(s) {
-      var c = s.target;
-      if (c.dead) { float(c.x, c.y - 30, 'gone', C.muted); return; }
-      if (c.side === 'enemy') {
-        if (c.hp <= DMG) { kill(c, 'player'); }
-        else { c.hp -= DMG; c.flash = 0.15; early++; float(c.x, c.y - 34, 'too early', C.gold); }
-      } else {
-        if (c.hp <= DMG && c.hp < c.max * 0.5) { kill(c, 'deny'); }
-        else if (c.hp >= c.max * 0.5) { float(c.x, c.y - 34, 'can\'t deny yet', C.gold); }
-        else { c.hp -= DMG; c.flash = 0.15; early++; float(c.x, c.y - 34, 'too early', C.gold); }
-      }
-    }
-    function kill(c, by) {
-      c.dead = true; c.hp = 0; c.respawn = rand(1.2, 2.4);
-      if (by === 'player') { var g = Math.round(rand(36, 46)); lh++; gold += g; float(c.x, c.y - 34, '+' + g + 'g', C.gold); }
-      else if (by === 'deny') { denies++; float(c.x, c.y - 34, '!', C.mentari); }
-      else if (c.side === 'enemy' && state === 'play') { missed++; float(c.x, c.y - 34, 'missed', C.red); }
-      updateInfo();
-    }
-
-    function step(dt) {
-      if (state === 'play') {
-        time -= dt;
-        if (time <= 0) {
-          time = 0; state = 'over';
-          var score = lh + denies;
-          if (score > best) { best = score; setBest(id, best); }
-          updateInfo();
-        }
-        // Lane fights: allies hit enemy creeps and vice versa; pace speeds up over the round
-        var pace = 1 + (ROUND - time) / ROUND * 0.6;
-        creeps.forEach(function (c) {
-          if (c.dead) {
-            c.respawn -= dt;
-            if (c.respawn <= 0) { var n = spawn(c.side, c.i); for (var k in n) c[k] = n[k]; }
-            return;
-          }
-          c.next -= dt * pace;
-          if (c.next <= 0) {
-            c.next = rand(0.55, 1.25);
-            var hit = Math.round(rand(c.side === 'enemy' ? 24 : 20, c.side === 'enemy' ? 46 : 40));
-            c.hp -= hit; c.flash = 0.1;
-            if (c.hp <= 0) kill(c, 'lane');
-          }
-          if (c.flash > 0) c.flash -= dt;
-        });
-        // Player attacks
-        shots.forEach(function (s) {
-          if (s.phase === 'windup') { s.t -= dt; if (s.t <= 0) { s.phase = 'fly'; s.t = FLY; } }
-          else if (s.phase === 'fly') {
-            s.t -= dt;
-            var k = 1 - Math.max(s.t, 0) / FLY;
-            s.x = W / 2 + (s.target.x - W / 2) * k; s.y = (H - 28) + (s.target.y - (H - 28)) * k;
-            if (s.t <= 0) { s.phase = 'done'; impact(s); }
-          }
-        });
-        shots = shots.filter(function (s) { return s.phase !== 'done'; });
-      }
-      floats.forEach(function (f) { f.t -= dt * 1.2; f.y -= dt * 30; });
-      floats = floats.filter(function (f) { return f.t > 0; });
-      draw();
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, W, H);
-      // lane
-      var g = ctx.createLinearGradient(0, 0, 0, H);
-      g.addColorStop(0, '#0B2A57'); g.addColorStop(1, '#06162F');
-      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-      ctx.fillStyle = 'rgba(113,197,232,.06)'; rr(ctx, 20, 70, W - 40, 230, 18); ctx.fill();
-      ctx.strokeStyle = 'rgba(113,197,232,.15)'; ctx.setLineDash([6, 8]); ctx.beginPath(); ctx.moveTo(30, 185); ctx.lineTo(W - 30, 185); ctx.stroke(); ctx.setLineDash([]);
-      // HUD
-      text(ctx, 'Time ' + Math.ceil(time) + 's', 24, 28, 15, '#fff', 'left');
-      text(ctx, 'Gold ' + gold, W / 2, 28, 15, C.gold);
-      text(ctx, 'Damage ' + DMG, W - 24, 28, 15, C.mentari, 'right');
-      // creeps
-      creeps.forEach(function (c) {
-        if (c.dead) return;
-        var enemy = c.side === 'enemy';
-        var body = enemy ? C.red : C.teal;
-        var killable = enemy ? c.hp <= DMG : (c.hp <= DMG && c.hp < c.max * 0.5);
-        ctx.save();
-        ctx.translate(c.x, c.y);
-        if (c === hover) { ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; rr(ctx, -30, -30, 60, 60, 14); ctx.stroke(); }
-        ctx.fillStyle = c.flash > 0 ? '#fff' : body;
-        rr(ctx, -24, -22, 48, 44, 12); ctx.fill();
-        ctx.fillStyle = 'rgba(0,0,0,.35)'; // simple face
-        ctx.fillRect(-12, -6, 6, 6); ctx.fillRect(6, -6, 6, 6);
-        // hp bar
-        var w = 56, pct = Math.max(c.hp, 0) / c.max;
-        ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(-w / 2, -40, w, 7);
-        ctx.fillStyle = enemy ? '#E8584A' : '#3FD9C5'; ctx.fillRect(-w / 2, -40, w * pct, 7);
-        // damage marker on the bar
-        ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.fillRect(-w / 2 + w * (DMG / c.max), -42, 1.5, 11);
-        if (!enemy) { ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.fillRect(-w / 2 + w * 0.5, -42, 1, 11); }
-        if (killable && state === 'play') { ctx.strokeStyle = C.gold; ctx.lineWidth = 2; rr(ctx, -26, -24, 52, 48, 13); ctx.stroke(); }
-        ctx.restore();
-      });
-      // hero
-      ctx.fillStyle = C.blue; ctx.beginPath(); ctx.arc(W / 2, H - 28, 18, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = C.mentari; ctx.lineWidth = 3; ctx.stroke();
-      shots.forEach(function (s) {
-        if (s.phase === 'windup') {
-          ctx.strokeStyle = C.gold; ctx.lineWidth = 3; ctx.beginPath();
-          ctx.arc(W / 2, H - 28, 24, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (1 - s.t / WINDUP)); ctx.stroke();
-        } else {
-          ctx.fillStyle = C.gold; ctx.beginPath(); ctx.arc(s.x, s.y, 6, 0, Math.PI * 2); ctx.fill();
-        }
-      });
-      floats.forEach(function (f) { ctx.globalAlpha = Math.max(f.t, 0); text(ctx, f.s, f.x, f.y, 14, f.c); ctx.globalAlpha = 1; });
-      // overlays
-      if (state === 'ready') banner('Last Hit Trainer', 'Click a creep to start. Gold outline = killable now.');
-      if (state === 'over') {
-        var tries = lh + missed, acc = tries ? Math.round(lh / tries * 100) : 0;
-        banner('Round over: ' + lh + ' LH / ' + denies + ' DN', 'Accuracy ' + acc + '% · too early ' + early + ' · best ' + best + ' · click to play again');
-      }
-    }
-    function banner(a, b) {
-      ctx.fillStyle = 'rgba(4,20,48,.82)'; rr(ctx, 70, 150, W - 140, 90, 16); ctx.fill();
-      text(ctx, a, W / 2, 182, 22, '#fff', 'center', 700);
-      text(ctx, b, W / 2, 214, 13, C.ice, 'center', 500);
-    }
-
-    reset();
-    stopLoop = loop(step);
-    return {
-      restart: reset,
-      key: function () {},
-      stop: function () { stopLoop(); canvas.removeEventListener('pointerdown', onDown); canvas.removeEventListener('pointermove', onMove); }
-    };
-  }
 
   /* =====================================================================
      GAME 2: DATA JANITOR

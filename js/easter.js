@@ -6,7 +6,7 @@
   'use strict';
   var doc = document;
   var me = doc.currentScript || doc.querySelector('script[src*="easter.js"]');
-  var arcadeSrc = me ? me.src.replace(/easter\.js(\?.*)?$/, 'arcade.js') : 'js/arcade.js';
+  var arcadeSrc = me ? me.src.replace(/easter\.js(\?.*)?$/, 'arcade.js?v=20261122') : 'js/arcade.js';
 
   function toast(msg) {
     var t = doc.querySelector('.egg-toast');
