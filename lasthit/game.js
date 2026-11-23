@@ -104,8 +104,8 @@
   try { heroType = localStorage.getItem('lh-hero') === 'melee' ? 'melee' : 'ranged'; } catch (e) {}
   // ranged: the original hero. melee: more damage and health, but must walk up to the creep.
   var HERO = {
-    ranged: { hp: 620, armor: 3, dmg: [52, 58], range: 500, ap: 0.4, bat: 1.42, proj: 1200 },
-    melee: { hp: 760, armor: 4, dmg: [61, 67], range: 150, ap: 0.4, bat: 1.45, proj: 0 }
+    ranged: { hp: 620, armor: 3, dmg: [52, 58], range: 500, ap: 0.3, bat: 1.42, proj: 1250 },
+    melee: { hp: 760, armor: 4, dmg: [61, 67], range: 150, ap: 0.3, bat: 1.42, proj: 0 }
   };
   function heroSpec(team, isPlayer) {
     var dir = team === 0 ? 1 : -1, p = P(-dir * 640, isPlayer ? 40 : -40), H = HERO[heroType];
@@ -313,7 +313,11 @@
     if (o && o.type === 'attack' && !canAttack(h, o.tgt)) { h.order = o = null; h.wind = -1; }
     if (h.wind >= 0) {
       h.wind -= dt;
-      if (h.wind < 0 && o && o.type === 'attack') { release(h, o.tgt); if (o.once) h.order = null; }
+      if (h.wind < 0 && o && o.type === 'attack') {
+        release(h, o.tgt);
+        h.cd = h.bat - h.ap;                 // cooldown only counts once the hit is actually released
+        h.order = null;                      // one click = one hit, then hold (no auto-attacking full-HP creeps)
+      }
       return;
     }
     if (!o) return;
@@ -322,7 +326,7 @@
     if (dist(h, t) > reach) moveToward(h, t.x, t.y, dt);
     else {
       h.facing = Math.atan2(t.y - h.y, t.x - h.x);
-      if (h.cd <= 0) { h.wind = h.ap; h.cd = h.bat; if (h.player) sfx.swing(); }
+      if (h.cd <= 0) { h.wind = h.ap; if (h.player) sfx.swing(); }   // cancelling the swing costs nothing
     }
   }
 
@@ -372,7 +376,7 @@
     if (!canAttack(me, t)) {
       sfx.no(); float(t, t.team === me.team ? (t.kind === 'hero' ? "can't" : t.kind === 'tower' ? 'not below 10%' : 'not below 50%') : "can't", '#cccccc', 13); return;
     }
-    if (me.order && me.order.tgt !== t) me.wind = -1;
+    if (!me.order || me.order.tgt !== t) me.wind = -1;     // new target: start a fresh swing right away
     me.order = { type: 'attack', tgt: t };
     if (t.kind === 'hero') aggro(me);
   }
@@ -556,6 +560,7 @@
       ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
       ctx.strokeStyle = u.player ? '#ffffff' : '#ffb3a8'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, r + 3, 0, 7); ctx.stroke();
       ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x + Math.cos(u.facing) * r * 0.6, y + Math.sin(u.facing) * r * 0.6, 3, 0, 7); ctx.fill();
+      if (u.player && u.wind < 0 && u.cd > 0) { ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, r + 7, -Math.PI / 2, -Math.PI / 2 + (1 - u.cd / (u.bat - u.ap)) * Math.PI * 2); ctx.stroke(); }
       if (u.wind >= 0) { ctx.strokeStyle = '#ffd34d'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(x, y, r + 7, -Math.PI / 2, -Math.PI / 2 + (1 - u.wind / u.ap) * Math.PI * 2); ctx.stroke(); }
       bar(x - 24, y - r - 14, 48, 5, u.hp / u.max, u.team === my ? '#6cc04a' : '#d9473c');
       txt(u.player ? 'You' : 'Enemy mid', x, y + r + 12, 10, u.player ? '#fff' : '#ffc9c0');
