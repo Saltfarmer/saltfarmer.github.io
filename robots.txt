@@ -26,4 +26,6 @@ Disallow: /resume/
 User-agent: *
 Allow: /
 
+Sitemap: https://saltfarmer.github.io/sitemap.xml
 Sitemap: https://saltfarmer.github.io/blog/sitemap.xml
+Sitemap: https://saltfarmer.github.io/micro-salt/sitemap.xml

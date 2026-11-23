@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Gate pages. The blog and micro-salt build their own sitemaps (listed in robots.txt). /cv/ is left out on purpose. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://saltfarmer.github.io/</loc><changefreq>monthly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://saltfarmer.github.io/whoami/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://saltfarmer.github.io/lasthit/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://saltfarmer.github.io/bubu/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+</urlset>
